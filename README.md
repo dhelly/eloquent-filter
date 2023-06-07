@@ -120,9 +120,27 @@ Consulta que deve trazer apenas usuário que não sejam admin
 ```
 
 #### 2 Problema
-Ordenação dos dados
+Ordenação dos dados. Protegendo as ordenações
 
+```
+    request()->validate([
+        'column' => 'in:name,email',
+        'direction' => 'in:asc,desc'
+    ]);
 
+    return view('dashboard',[
+        'users' => User::query()
+            ->where('admin', '=', false)
+            ->search(request()->search)
+            ->when(request()->filled('column'),
+                fn(Builder $q) => $q->orderBy(
+                    request()->column,
+                    request()->direction ?: 'asc'
+                )
+            )
+            ->get()
+    ]);
+```
 
 ## Licença
 MIT

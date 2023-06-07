@@ -15,7 +15,24 @@
                         <!-- Name -->
                         <div>
                             <input id="search" name="search" class="block mt-1 w-full" type="text" value="{{ old('search') }}"/>
-                            <button type="button" class="text-black bg-red-500 mt-2 py-3 px-4 rounded">Buscar</button>
+
+                            <div>
+                                <select name="column">
+                                    <option value="" {{ request()->column == '' ? 'selected' : '' }}>---</option>
+                                    <option value="name" {{ request()->column == 'name' ? 'selected' : '' }}>Name</option>
+                                    <option value="email" {{ request()->column == 'email' ? 'selected' : '' }}>Email</option>
+                                </select>
+
+                                <select name="direction">
+                                    <option value="asc" {{ request()->direction == 'asc' ? 'selected' : '' }}>Asc</option>
+                                    <option value="desc" {{ request()->direction == 'desc' ? 'selected' : '' }}>Desc</option>
+                                </select>
+                                @error('column')
+                                <div class="text-red-400 font-bold">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <button type="submit" class="text-black bg-red-500 mt-2 py-3 px-4 rounded">Buscar</button>
                         </div>
                     </form>
                     {{ request('search') }}
