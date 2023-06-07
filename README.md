@@ -7,6 +7,11 @@ Baseado no vídeo:
 
 Melhorar os conhecimentos no Eloquent
 
+## Tecnologias
+
+- Laravel
+- MariaDB
+
 ## Pacotes
 
 | composer require barryvdh/laravel-debugbar --dev
@@ -15,7 +20,7 @@ Melhorar os conhecimentos no Eloquent
 
 Consulta que deve trazer apenas usuário que não sejam admin
 
-1º Problema
+#### 1 Problema
 ```
     return view('dashboard',[
         'users' => User::query()
@@ -25,8 +30,7 @@ Consulta que deve trazer apenas usuário que não sejam admin
             ->get()
     ]);
 ```
-Solução
-Delimitando o escopo no Eloquent
+#### 1 Delimitando o escopo no Eloquent
 ```
     return view('dashboard',[
         'users' => User::query()
@@ -38,8 +42,8 @@ Delimitando o escopo no Eloquent
             ->get()
     ]);
 ```
-Melhorando a solução
-Usando o `when`
+
+#### 2 Usando o `when`
 ```
     return view('dashboard',[
         'users' => User::query()
@@ -54,7 +58,7 @@ Usando o `when`
     ]);
 ```
 
-Outra solução com o `filled`
+#### 3 solução com o `filled`
 ```
     return view('dashboard',[
         'users' => User::query()
@@ -69,10 +73,56 @@ Outra solução com o `filled`
     ]);
 ```
 
-## Tecnologias
+#### 4 Usando `scope`
 
-- Laravel
-- MariaDB
+- Criamos um scope no model User
+
+```
+    public function scopeSearch(Builder $q, string $search)
+    {
+        return $q->where('name', 'like', '%'. $search .'%')
+            ->orWhere('email', 'like', '%'. $search .'%');
+    }
+```
+
+- Código da busca usando scope 
+```
+    return view('dashboard',[
+        'users' => User::query()
+            ->where('admin', '=', false)
+            ->when(request()->filled('search'),
+                fn(Builder $q) => $q->search(request()->search))
+            ->get()
+    ]);
+```
+
+#### 5 Usando `scope` mais simplificado
+
+- Model User
+```
+    public function scopeSearch(Builder $q, string $search)
+    {
+        return $q->when(str($search)->isNotEmpty(),
+            fn(Builder $q) => $q->where('name', 'like', '%'. $search .'%')
+            ->orWhere('email', 'like', '%'. $search .'%'));
+    }
+```
+
+- Código de busca usando o scope simplificado
+
+```
+    return view('dashboard',[
+        'users' => User::query()
+            ->where('admin', '=', false)
+            ->search(request()->search)
+            ->get()
+    ]);
+```
+
+#### 2 Problema
+Ordenação dos dados
+
+
 
 ## Licença
 MIT

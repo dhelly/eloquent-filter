@@ -14,12 +14,7 @@ class DashboardController extends Controller
         return view('dashboard',[
             'users' => User::query()
                 ->where('admin', '=', false)
-                ->when(request()->filled('search'),function(Builder $q){
-                    return $q->where(function (Builder $q){
-                        return $q->where('name', 'like', '%'. request()->search .'%')
-                            ->orWhere('email', 'like', '%'. request()->search .'%');
-                    });
-                })
+                ->search(request()->search)
                 ->get()
         ]);
     }
